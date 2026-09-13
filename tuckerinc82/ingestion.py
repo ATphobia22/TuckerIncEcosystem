@@ -5,7 +5,7 @@ from datetime import datetime, timezone
 from typing import Any
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlparse
-from urllib.request import Request, urlopen
+from urllib.request import HTTPRedirectHandler, Request, build_opener
 
 from .fabric import DataRecord, freshness_state
 from .registry import is_registered_https_url
@@ -16,6 +16,16 @@ class IngestionError(RuntimeError):
 
 
 MAX_PAYLOAD_BYTES = 5 * 1024 * 1024
+
+
+class _AllowlistedRedirectHandler(HTTPRedirectHandler):
+    def __init__(self, source_id: str) -> None:
+        self.source_id = source_id
+
+    def redirect_request(self, req: Request, fp: Any, code: int, msg: str, headers: Any, newurl: str) -> Request | None:
+        if not is_registered_https_url(self.source_id, newurl):
+            raise IngestionError("redirect destination is not the registered source endpoint")
+        return super().redirect_request(req, fp, code, msg, headers, newurl)
 
 
 def fetch_json_source(
@@ -43,12 +53,15 @@ def fetch_json_source(
         method="GET",
     )
     retrieved_at = datetime.now(timezone.utc)
+    opener = build_opener(_AllowlistedRedirectHandler(source_id))
     try:
-        with urlopen(request, timeout=timeout_seconds) as response:
+        with opener.open(request, timeout=timeout_seconds) as response:
             content_length = response.headers.get("Content-Length")
             if content_length and int(content_length) > MAX_PAYLOAD_BYTES:
                 raise IngestionError("source payload exceeds configured size limit")
             raw_payload = response.read(MAX_PAYLOAD_BYTES + 1)
+    except IngestionError:
+        raise
     except (HTTPError, URLError, TimeoutError, ValueError) as exc:
         raise IngestionError(f"source fetch failed for {source_id}") from exc
 
