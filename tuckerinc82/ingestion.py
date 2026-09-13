@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import urllib.request
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -11,7 +12,7 @@ from .evidence import EvidenceEnvelope, append_evidence, content_hash
 from .source_mesh import SourceEndpoint, enabled_sources
 
 
-class NoRedirectHandler(__import__("urllib.request", fromlist=["HTTPRedirectHandler"]).HTTPRedirectHandler):
+class NoRedirectHandler(urllib.request.HTTPRedirectHandler):
     def redirect_request(self, request: Request, fp: Any, code: int, msg: str, headers: Any, newurl: str) -> None:
         raise URLError(f"redirect rejected for authoritative source: {newurl}")
 
@@ -25,9 +26,10 @@ class AuthoritativeIngestor:
         self._opener = build_opener(NoRedirectHandler())
 
     def fetch(self, source: SourceEndpoint) -> EvidenceEnvelope:
+        _ = source.host  # Validates HTTPS and hostname before any network operation.
         request = Request(
             source.endpoint,
-            headers={"Accept": "application/json, text/plain, text/html;q=0.8", "User-Agent": "TuckerAI/0.6"},
+            headers={"Accept": "application/json, text/plain, text/html;q=0.8", "User-Agent": "TuckerAI/0.7"},
             method="GET",
         )
         with self._opener.open(request, timeout=self.timeout_seconds) as response:
