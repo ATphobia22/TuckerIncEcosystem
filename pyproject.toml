@@ -1,6 +1,10 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
 [project]
 name = "tuckerinc82"
-version = "0.3.0"
+version = "0.3.1"
 description = "Tucker AI: hybrid quantum-classical AI, governed experimentation, and authoritative data fabric"
 requires-python = ">=3.11"
 dependencies = [
@@ -11,26 +15,41 @@ dependencies = [
 
 [project.optional-dependencies]
 qml = [
-    "pennylane>=0.43",
-    "qiskit>=2.2",
-    "qiskit-machine-learning>=0.9",
+    "pennylane>=0.45,<0.46",
+    "qiskit>=2.2,<3",
+    "qiskit-machine-learning>=0.9,<1",
     "torch>=2.7",
     "torchquantum>=0.1.8",
     "cudaq>=0.15",
-    "cirq>=1.6",
-    "mitiq>=0.45",
-    "amazon-braket-sdk>=1.99",
-    "merlinquantum>=0.4"
+    "cirq>=1.6,<2",
+    "mitiq>=0.45,<1",
+    "amazon-braket-sdk>=1.99,<2",
+    "merlinquantum>=0.4,<0.5"
 ]
 tensorflow-quantum = [
     "tensorflow>=2.19,<2.20",
-    "tensorflow-quantum>=0.7"
+    "tensorflow-quantum>=0.7,<1"
+]
+photonic = [
+    "merlinquantum>=0.4,<0.5"
+]
+physics = [
+    "qutip>=5.3,<6",
+    "dynamiqs>=0.4,<1",
+    "openfermion>=1.8,<2"
+]
+optimization = [
+    "dwave-ocean-sdk>=9.3,<10"
 ]
 dev = [
     "httpx>=0.28",
     "pytest>=8.4",
     "ruff>=0.12"
 ]
+
+[tool.setuptools.packages.find]
+include = ["tuckerinc82*"]
+exclude = ["data*", "legacy*", "public*", "tests*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
