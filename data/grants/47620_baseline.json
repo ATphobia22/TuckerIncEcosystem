@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "purpose": "Planning baseline for Mount Vernon, Point Township, Black Township, and Posey County grant intelligence.",
+  "authority_rule": "Do not treat this baseline as current eligibility or deadline truth. Revalidate live authoritative sources before action.",
+  "source_documents": [
+    "47620_Grant_Master_Matrix.pdf",
+    "47620_Grant_link Matrix .pdf"
+  ],
+  "domains": [
+    "federal_grant_infrastructure",
+    "fema_emergency_management",
+    "usace_noaa_water_resilience",
+    "epa_idem_ifa_water",
+    "ocra_ihcda_housing_community",
+    "usda_rural_development",
+    "transportation_ports",
+    "broadband_digital_infrastructure",
+    "economic_development",
+    "workforce_education",
+    "doj_public_safety",
+    "rural_health",
+    "energy_grid_resilience",
+    "agriculture_food_systems",
+    "nonprofit_faith_philanthropy"
+  ],
+  "priority_opportunities": [
+    {"program": "OCRA CDBG", "local_fit": "Mount Vernon / Posey County", "status": "revalidate_live"},
+    {"program": "INDOT Community Crossings Matching Grant", "local_fit": "Mount Vernon / Posey County", "status": "revalidate_live"},
+    {"program": "Indiana SRF CWSRF/DWSRF", "local_fit": "Water and wastewater infrastructure", "status": "rolling_or_periodic"},
+    {"program": "USDA Community Facilities", "local_fit": "Eligible rural public/community facilities", "status": "rolling_or_periodic"},
+    {"program": "FEMA mitigation programs", "local_fit": "Flood and resilience projects", "status": "revalidate_live"},
+    {"program": "Indiana Broadband / BEAD", "local_fit": "Municipal partnership and beneficiary pathways", "status": "state_rollout_dependent"},
+    {"program": "EDA Public Works / Economic Adjustment Assistance", "local_fit": "Economic and industrial infrastructure", "status": "revalidate_live"},
+    {"program": "USDOT rural infrastructure programs", "local_fit": "Rural transportation and freight", "status": "revalidate_live"}
+  ],
+  "evidence_note": "The uploaded master matrix explicitly requires direct validation against active federal and state notices before actionable use."
+}
