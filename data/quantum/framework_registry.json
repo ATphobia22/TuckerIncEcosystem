@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "project": "Tucker AI",
+  "policy": "Research and adapter registry; dependencies are optional and are never vendored or copied wholesale.",
+  "frameworks": [
+    {"id":"qiskit","role":"general-purpose-sdk","license":"Apache-2.0","integration":"optional-qml"},
+    {"id":"cirq","role":"hardware-aware-circuit-framework","license":"Apache-2.0","integration":"optional-qml"},
+    {"id":"cuda-q","role":"heterogeneous-hybrid-qpu-gpu-cpu","license":"Apache-2.0","integration":"optional-qml"},
+    {"id":"pennylane","role":"differentiable-qml","license":"Apache-2.0","integration":"optional-qml"},
+    {"id":"pennylane-catalyst","role":"hybrid-jit-aot-compiler","license":"Apache-2.0","integration":"planned-adapter"},
+    {"id":"pennylane-lightning","role":"high-performance-simulation","license":"Apache-2.0","integration":"planned-adapter"},
+    {"id":"qiskit-aer","role":"noise-aware-simulation","license":"Apache-2.0","integration":"planned-adapter"},
+    {"id":"qutip","role":"open-quantum-system-dynamics","license":"BSD-3-Clause","integration":"optional-physics"},
+    {"id":"openfermion","role":"quantum-chemistry","license":"Apache-2.0","integration":"optional-physics"},
+    {"id":"dynamiqs","role":"jax-differentiable-dynamics","license":"open-source","integration":"optional-physics"},
+    {"id":"torchquantum","role":"pytorch-qml","license":"Apache-2.0","integration":"optional-qml"},
+    {"id":"tensorflow-quantum","role":"tensorflow-hybrid-qml","license":"Apache-2.0","integration":"optional-tensorflow"},
+    {"id":"quairkit","role":"qml-algorithm-development","license":"Apache-2.0","integration":"research-adapter"},
+    {"id":"merlinquantum","role":"photonic-qml","license":"MIT","integration":"optional-photonic"},
+    {"id":"dwave-ocean-sdk","role":"quantum-annealing-optimization","license":"Apache-2.0","integration":"optional-optimization"},
+    {"id":"qualtran","role":"fault-tolerant-algorithm-research","license":"Apache-2.0","integration":"research-adapter"},
+    {"id":"tket2","role":"hardware-agnostic-compiler","license":"Apache-2.0","integration":"research-adapter"},
+    {"id":"qulacs","role":"fast-cpu-gpu-simulation","license":"MIT","integration":"research-adapter"},
+    {"id":"openqasm","role":"quantum-program-interchange","license":"Apache-2.0","integration":"standard-interface"},
+    {"id":"qir","role":"llvm-based-quantum-intermediate-representation","license":"open-standard","integration":"standard-interface"}
+  ],
+  "excluded": [
+    "TensorNetwork Google archive: archived and read-only; retained as historical research reference, not a production dependency."
+  ]
+}
