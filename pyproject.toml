@@ -15,12 +15,12 @@ qml = [
     "qiskit>=2.2",
     "qiskit-machine-learning>=0.9",
     "torch>=2.7",
-    "torchquantum>=0.1",
-    "cudaq>=0.10",
+    "torchquantum>=0.1.8",
+    "cudaq>=0.15",
     "cirq>=1.6",
     "mitiq>=0.45",
     "amazon-braket-sdk>=1.99",
-    "merlin-quantum>=0.3"
+    "merlinquantum>=0.4"
 ]
 tensorflow-quantum = [
     "tensorflow>=2.19,<2.20",
