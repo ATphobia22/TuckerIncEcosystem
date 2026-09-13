@@ -1,28 +1,61 @@
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fpython%2Ffastapi&demo-title=FastAPI&demo-description=Use%20FastAPI%20on%20Vercel%20with%20Serverless%20Functions%20using%20the%20Python%20Runtime.&demo-url=https%3A%2F%2Fvercel-plus-fastapi.vercel.app%2F&demo-image=https://assets.vercel.com/image/upload/v1669994600/random/python.png)
+# TuckerInc.82
 
-# FastAPI + Vercel
+Standalone production foundation for Tucker's cross-project software assets, real-world data fabric, geospatial/resilience tooling, grant intelligence, AI/quantum adapters, and reusable utilities.
 
-This example shows how to use FastAPI on Vercel with Serverless Functions using the [Python Runtime](https://vercel.com/docs/concepts/functions/serverless-functions/runtimes/python).
+## Architecture
 
-## Demo
-
-https://vercel-plus-fastapi.vercel.app/
-
-## How it Works
-
-This example uses the Asynchronous Server Gateway Interface (ASGI) with FastAPI to enable handling requests on Vercel with Serverless Functions.
-
-## Running Locally
-
-```bash
-npm i -g vercel
-vercel dev
+```text
+Authoritative Sources
+        ↓
+Source Registry → Bounded Ingestion → Raw Evidence
+        ↓                         ↓
+Validation → Normalization → Provenance Ledger
+        ↓
+Freshness / Quality State
+        ↓
+Current-State API → Applications / Utilities / Analytics
 ```
 
-Your FastAPI application is now available at `http://localhost:3000`.
+## Current implementation
 
-## One-Click Deploy
+- FastAPI gateway with health and source-registry endpoints.
+- Strict Pydantic data contracts with UTC timestamp validation.
+- Deterministic SHA-256 content fingerprints.
+- Explicit current/stale/expired freshness semantics.
+- HTTPS and registered-origin controls for JSON ingestion.
+- Bounded external payload size and request timeout.
+- Content-addressed raw evidence store.
+- Provenance event contract.
+- Explicit horizontal CRS / vertical datum metadata contract.
+- 47620 grant-intelligence planning baseline with live-source revalidation policy.
+- Cross-project source manifest documenting copied/adapted assets.
+- Preserved Tucker Console compatibility utility under `legacy/`.
+- GitHub Actions CI for Ruff and Pytest.
 
-Deploy the example using [Vercel](https://vercel.com?utm_source=github&utm_medium=readme&utm_campaign=vercel-examples):
+## Source integration policy
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Fvercel%2Fexamples%2Ftree%2Fmain%2Fpython%2Ffastapi&demo-title=FastAPI&demo-description=Use%20FastAPI%20on%20Vercel%20with%20Serverless%20Functions%20using%20the%20Python%20Runtime.&demo-url=https%3A%2F%2Fvercel-plus-fastapi.vercel.app%2F&demo-image=https://assets.vercel.com/image/upload/v1669994600/random/python.png)
+Source repositories are copied selectively into bounded namespaces; repository histories are never merged into this project. Source repositories remain independent.
+
+The integration manifest is at `docs/integration/source-manifest.md`.
+
+## Domain boundary
+
+Medical and clinical implementation is intentionally excluded. Medical systems remain in TMRDS. TuckerInc.82 may contain generic infrastructure only when it has no patient/clinical functionality or data.
+
+## Data authority
+
+Project documents are planning inputs. Current grant status, deadlines, eligibility, regulatory requirements, engineering facts, and external measurements must be revalidated against the registered authoritative source before operational use.
+
+## Development
+
+```bash
+python -m pip install -e '.[dev]'
+ruff check .
+pytest -q
+```
+
+Application entrypoint: `main:app`.
+
+## Security baseline
+
+Do not commit API keys, tokens, private keys, certificates, credentials, model weights, generated artifacts, or `.env` files. External data is untrusted input and must pass transport, schema, size, timestamp, and provenance controls before becoming current state.
