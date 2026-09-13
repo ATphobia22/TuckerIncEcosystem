@@ -1,0 +1,12 @@
+{
+  "schema_version": "1.0",
+  "purpose": "Deterministic repository component classification seed for Tucker AI intelligence workflows.",
+  "components": [
+    {"path": "tuckerinc82/source_mesh.py", "category": "connector", "confidence": 0.9},
+    {"path": "tuckerinc82/evidence.py", "category": "evidence", "confidence": 0.9},
+    {"path": "tuckerinc82/event_bus.py", "category": "event", "confidence": 0.9},
+    {"path": "tuckerinc82/backends.py", "category": "quantum", "confidence": 0.9},
+    {"path": "tuckerinc82/guardrails.py", "category": "governance", "confidence": 0.9},
+    {"path": "tuckerinc82/tucker_ai.py", "category": "quantum", "confidence": 0.9}
+  ]
+}

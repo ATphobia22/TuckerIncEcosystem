@@ -1,29 +1,56 @@
 from __future__ import annotations
 
 import hashlib
+import json
+from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
+
+from pydantic import BaseModel, ConfigDict, Field
+
+ROOT = Path(__file__).resolve().parents[1]
+EVIDENCE_ROOT = ROOT / "data" / "evidence"
 
 
-class EvidenceStore:
-    """Content-addressed immutable raw evidence store for local deployments."""
+class EvidenceEnvelope(BaseModel):
+    model_config = ConfigDict(extra="forbid")
 
-    def __init__(self, root: Path) -> None:
-        self.root = root
-        self.root.mkdir(parents=True, exist_ok=True)
+    source_id: str = Field(min_length=1)
+    source_url: str = Field(min_length=1)
+    retrieved_at: datetime
+    schema_version: str = Field(min_length=1)
+    payload: dict[str, Any]
+    content_hash: str = Field(min_length=64, max_length=64)
 
-    def put(self, payload: bytes) -> str:
-        digest = hashlib.sha256(payload).hexdigest()
-        destination = self.root / digest[:2] / f"{digest}.bin"
-        destination.parent.mkdir(parents=True, exist_ok=True)
-        if destination.exists():
-            return digest
-        temporary = destination.with_suffix(".tmp")
-        temporary.write_bytes(payload)
-        temporary.replace(destination)
-        return digest
+    def utc(self) -> "EvidenceEnvelope":
+        timestamp = self.retrieved_at
+        if timestamp.tzinfo is None:
+            raise ValueError("retrieved_at must be timezone-aware")
+        return self.model_copy(update={"retrieved_at": timestamp.astimezone(timezone.utc)})
 
-    def get(self, digest: str) -> bytes:
-        if len(digest) != 64 or any(character not in "0123456789abcdef" for character in digest):
-            raise ValueError("invalid SHA-256 evidence identifier")
-        path = self.root / digest[:2] / f"{digest}.bin"
-        return path.read_bytes()
+
+def canonical_json(payload: Any) -> bytes:
+    return json.dumps(payload, sort_keys=True, separators=(",", ":"), ensure_ascii=False).encode("utf-8")
+
+
+def content_hash(payload: Any) -> str:
+    return hashlib.sha256(canonical_json(payload)).hexdigest()
+
+
+def append_evidence(envelope: EvidenceEnvelope) -> Path:
+    """Write immutable, content-addressed evidence without overwriting an existing object."""
+    normalized = envelope.utc()
+    expected = content_hash(normalized.payload)
+    if expected != normalized.content_hash:
+        raise ValueError("content_hash does not match canonical payload")
+    target = EVIDENCE_ROOT / normalized.source_id / f"{normalized.content_hash}.json"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if target.exists():
+        existing = json.loads(target.read_text(encoding="utf-8"))
+        if existing != normalized.model_dump(mode="json"):
+            raise ValueError("immutable evidence collision detected")
+        return target
+    temporary = target.with_suffix(".tmp")
+    temporary.write_text(json.dumps(normalized.model_dump(mode="json"), sort_keys=True, indent=2), encoding="utf-8")
+    temporary.replace(target)
+    return target
