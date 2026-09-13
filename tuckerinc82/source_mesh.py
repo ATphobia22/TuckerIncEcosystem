@@ -12,19 +12,25 @@ REGISTRY = ROOT / "data" / "sources" / "source_registry.json"
 
 
 class SourceEndpoint(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    model_config = ConfigDict(extra="allow")
 
     source_id: str = Field(min_length=1)
     name: str = Field(min_length=1)
-    url: str = Field(min_length=1)
     authority: str = Field(min_length=1)
     cadence: str = Field(min_length=1)
     enabled: bool = True
     tags: list[str] = Field(default_factory=list)
+    endpoint: str = Field(min_length=1)
+    geographic_scope: str = "unknown"
+    ttl_seconds: int = 86400
+
+    @property
+    def url(self) -> str:
+        return self.endpoint
 
     @property
     def host(self) -> str:
-        parsed = urlparse(self.url)
+        parsed = urlparse(self.endpoint)
         if parsed.scheme != "https" or not parsed.hostname:
             raise ValueError("authoritative source endpoints must use HTTPS URLs")
         return parsed.hostname.lower()

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from pathlib import Path
 
 from fastapi import FastAPI
 
@@ -8,20 +9,25 @@ from .backends import discover_backends
 from .benchmarks import BenchmarkResult, aggregate
 from .capabilities import discover_capabilities
 from .event_bus import DataEvent, EventBus
+from .event_ledger import EventLedger
 from .evidence import EvidenceEnvelope, EVIDENCE_ROOT, append_evidence, content_hash
 from .fabric import DataRecord
 from .guardrails import GuardrailRequest, evaluate_guardrails
+from .ingestion import AuthoritativeIngestor
 from .self_healing import propose_remediation
 from .source_mesh import enabled_sources
 from .tucker_ai import TuckerExperiment
 
+ROOT = Path(__file__).resolve().parents[1]
+EVENT_LEDGER = EventLedger(ROOT / "data" / "events" / "events.ndjson")
+EVENT_BUS = EventBus(ledger=EVENT_LEDGER)
+INGESTOR = AuthoritativeIngestor()
+
 app = FastAPI(
     title="Tucker AI",
     description="Standalone hybrid quantum-classical AI and authoritative data-fabric gateway.",
-    version="0.5.0",
+    version="0.7.0",
 )
-
-EVENT_BUS = EventBus()
 
 
 @app.get("/api/health")
@@ -33,6 +39,15 @@ def health() -> dict[str, str]:
 def sources() -> dict[str, object]:
     registered = [source.model_dump(mode="json") for source in enabled_sources()]
     return {"count": len(registered), "sources": registered}
+
+
+@app.post("/api/ingestion/source/{source_id}")
+def ingest_source(source_id: str) -> dict[str, object]:
+    source = next((item for item in enabled_sources() if item.source_id == source_id), None)
+    if source is None:
+        raise ValueError(f"unknown or disabled source: {source_id}")
+    path = INGESTOR.ingest(source)
+    return {"source_id": source_id, "evidence_path": str(path.relative_to(EVIDENCE_ROOT))}
 
 
 @app.get("/api/tucker-ai/capabilities")

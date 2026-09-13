@@ -6,9 +6,13 @@ import threading
 from collections import deque
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from typing import Any, Callable
+from typing import Any, Callable, Protocol
 
 from pydantic import BaseModel, ConfigDict, Field
+
+
+class EventSink(Protocol):
+    def append(self, event: "DataEvent") -> None: ...
 
 
 class DataEvent(BaseModel):
@@ -40,15 +44,16 @@ Handler = Callable[[DataEvent], None]
 
 
 class EventBus:
-    """Bounded, deterministic in-process event bus with deduplication and replayable DLQ."""
+    """Bounded event bus with durable append-before-dispatch, deduplication, and DLQ replay."""
 
-    def __init__(self, max_queue: int = 10_000) -> None:
+    def __init__(self, max_queue: int = 10_000, ledger: EventSink | None = None) -> None:
         if max_queue < 1:
             raise ValueError("max_queue must be positive")
         self._queue: deque[DataEvent] = deque(maxlen=max_queue)
         self._seen: set[str] = set()
         self._handlers: dict[str, list[Handler]] = {}
         self._dlq: list[DeadLetter] = []
+        self._ledger = ledger
         self._lock = threading.RLock()
 
     def subscribe(self, event_type: str, handler: Handler) -> None:
@@ -58,11 +63,12 @@ class EventBus:
             self._handlers.setdefault(event_type, []).append(handler)
 
     def publish(self, event: DataEvent) -> bool:
-        key = event.event_id
         with self._lock:
-            if key in self._seen:
+            if event.event_id in self._seen:
                 return False
-            self._seen.add(key)
+            if self._ledger is not None:
+                self._ledger.append(event)
+            self._seen.add(event.event_id)
             self._queue.append(event)
         self._dispatch(event)
         return True
@@ -91,5 +97,6 @@ class EventBus:
                 "queued": len(self._queue),
                 "deduplicated": len(self._seen),
                 "dead_lettered": len(self._dlq),
+                "durable": self._ledger is not None,
                 "event_types": sorted(self._handlers),
             }

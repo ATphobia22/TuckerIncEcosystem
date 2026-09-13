@@ -2,88 +2,63 @@ from __future__ import annotations
 
 import json
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
-from urllib.error import HTTPError, URLError
-from urllib.parse import urlparse
-from urllib.request import HTTPRedirectHandler, Request, build_opener
+from urllib.error import URLError
+from urllib.request import Request, build_opener
 
-from .fabric import DataRecord, freshness_state
-from .registry import is_registered_https_url
-
-
-class IngestionError(RuntimeError):
-    """Raised when an external source cannot be safely ingested."""
+from .evidence import EvidenceEnvelope, append_evidence, content_hash
+from .source_mesh import SourceEndpoint, enabled_sources
 
 
-MAX_PAYLOAD_BYTES = 5 * 1024 * 1024
+class NoRedirectHandler(__import__("urllib.request", fromlist=["HTTPRedirectHandler"]).HTTPRedirectHandler):
+    def redirect_request(self, request: Request, fp: Any, code: int, msg: str, headers: Any, newurl: str) -> None:
+        raise URLError(f"redirect rejected for authoritative source: {newurl}")
 
 
-class _AllowlistedRedirectHandler(HTTPRedirectHandler):
-    def __init__(self, source_id: str) -> None:
-        self.source_id = source_id
+class AuthoritativeIngestor:
+    def __init__(self, timeout_seconds: float = 15.0, max_bytes: int = 5_000_000) -> None:
+        if timeout_seconds <= 0 or max_bytes <= 0:
+            raise ValueError("timeout_seconds and max_bytes must be positive")
+        self.timeout_seconds = timeout_seconds
+        self.max_bytes = max_bytes
+        self._opener = build_opener(NoRedirectHandler())
 
-    def redirect_request(self, req: Request, fp: Any, code: int, msg: str, headers: Any, newurl: str) -> Request | None:
-        if not is_registered_https_url(self.source_id, newurl):
-            raise IngestionError("redirect destination is not the registered source endpoint")
-        return super().redirect_request(req, fp, code, msg, headers, newurl)
+    def fetch(self, source: SourceEndpoint) -> EvidenceEnvelope:
+        request = Request(
+            source.endpoint,
+            headers={"Accept": "application/json, text/plain, text/html;q=0.8", "User-Agent": "TuckerAI/0.6"},
+            method="GET",
+        )
+        with self._opener.open(request, timeout=self.timeout_seconds) as response:
+            if response.status != 200:
+                raise RuntimeError(f"source returned HTTP {response.status}")
+            if response.geturl() != source.endpoint:
+                raise RuntimeError("authoritative source changed URL without explicit registry update")
+            body = response.read(self.max_bytes + 1)
+            if len(body) > self.max_bytes:
+                raise ValueError("authoritative payload exceeds configured size limit")
+            content_type = (response.headers.get("Content-Type") or "").split(";", 1)[0].lower()
 
+        text = body.decode("utf-8", errors="replace")
+        payload: dict[str, Any]
+        if content_type == "application/json":
+            decoded = json.loads(text)
+            payload = decoded if isinstance(decoded, dict) else {"value": decoded}
+        else:
+            payload = {"content_type": content_type or "unknown", "body": text}
 
-def fetch_json_source(
-    *,
-    source_id: str,
-    source_url: str,
-    cadence: str,
-    schema_version: str,
-    geographic_scope: str,
-    ttl_seconds: int,
-    timeout_seconds: float = 10.0,
-    user_agent: str = "TuckerInc.82/0.2",
-) -> DataRecord:
-    parsed = urlparse(source_url)
-    if parsed.scheme != "https" or not parsed.netloc:
-        raise IngestionError("only HTTPS sources are permitted")
-    if not is_registered_https_url(source_id, source_url):
-        raise IngestionError(f"URL is not registered for source {source_id}")
-    if timeout_seconds <= 0 or timeout_seconds > 60:
-        raise IngestionError("timeout_seconds must be between 0 and 60")
+        return EvidenceEnvelope(
+            source_id=source.source_id,
+            source_url=source.endpoint,
+            retrieved_at=datetime.now(timezone.utc),
+            schema_version="1.0",
+            payload=payload,
+            content_hash=content_hash(payload),
+        )
 
-    request = Request(
-        source_url,
-        headers={"Accept": "application/json", "User-Agent": user_agent},
-        method="GET",
-    )
-    retrieved_at = datetime.now(timezone.utc)
-    opener = build_opener(_AllowlistedRedirectHandler(source_id))
-    try:
-        with opener.open(request, timeout=timeout_seconds) as response:
-            content_length = response.headers.get("Content-Length")
-            if content_length and int(content_length) > MAX_PAYLOAD_BYTES:
-                raise IngestionError("source payload exceeds configured size limit")
-            raw_payload = response.read(MAX_PAYLOAD_BYTES + 1)
-    except IngestionError:
-        raise
-    except (HTTPError, URLError, TimeoutError, ValueError) as exc:
-        raise IngestionError(f"source fetch failed for {source_id}") from exc
+    def ingest(self, source: SourceEndpoint) -> Path:
+        return append_evidence(self.fetch(source))
 
-    if len(raw_payload) > MAX_PAYLOAD_BYTES:
-        raise IngestionError("source payload exceeds configured size limit")
-
-    try:
-        payload = json.loads(raw_payload)
-    except json.JSONDecodeError as exc:
-        raise IngestionError(f"source returned invalid JSON for {source_id}") from exc
-    if not isinstance(payload, dict):
-        raise IngestionError("top-level source payload must be a JSON object")
-
-    record = DataRecord(
-        source_id=source_id,
-        source_url=source_url,
-        retrieved_at=retrieved_at,
-        observed_at=retrieved_at,
-        cadence=cadence,
-        schema_version=schema_version,
-        geographic_scope=geographic_scope,
-        payload=payload,
-        freshness=freshness_state(retrieved_at, ttl_seconds, retrieved_at),
-    )
-    return record.with_integrity()
+    def ingest_enabled(self) -> list[Path]:
+        return [self.ingest(source) for source in enabled_sources()]
