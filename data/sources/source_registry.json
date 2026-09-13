@@ -1,0 +1,87 @@
+{
+  "schema_version": "1.0",
+  "authority_policy": "Authoritative source is preferred; project documents are planning baselines and never override live source status.",
+  "sources": [
+    {
+      "source_id": "usgs-03378500",
+      "name": "USGS Wabash River at New Harmony",
+      "authority": "USGS",
+      "cadence": "near_realtime",
+      "geographic_scope": "Posey County, Indiana",
+      "endpoint": "https://waterservices.usgs.gov/nwis/iv/?format=json&sites=03378500&parameterCd=00065",
+      "parameters": ["00065"],
+      "ttl_seconds": 900,
+      "enabled": true
+    },
+    {
+      "source_id": "city-mount-vernon",
+      "name": "City of Mount Vernon, Indiana",
+      "authority": "City of Mount Vernon",
+      "cadence": "periodic",
+      "geographic_scope": "Mount Vernon, Indiana 47620",
+      "endpoint": "https://www.mountvernonin.gov/",
+      "ttl_seconds": 86400,
+      "enabled": true
+    },
+    {
+      "source_id": "ocra-cdbg",
+      "name": "Indiana OCRA Community Development Block Grant",
+      "authority": "Indiana Office of Community and Rural Affairs",
+      "cadence": "periodic",
+      "geographic_scope": "Indiana non-entitlement local governments",
+      "endpoint": "https://www.in.gov/ocra/community-programs/community-development-block-grant-cdbg/",
+      "ttl_seconds": 86400,
+      "enabled": true
+    },
+    {
+      "source_id": "indot-ccmg",
+      "name": "INDOT Community Crossings Matching Grant",
+      "authority": "Indiana Department of Transportation",
+      "cadence": "periodic",
+      "geographic_scope": "Indiana local public agencies",
+      "endpoint": "https://www.in.gov/indot/local/ltap/community-crossings-matching-grant/",
+      "ttl_seconds": 86400,
+      "enabled": true
+    },
+    {
+      "source_id": "ifa-srf",
+      "name": "Indiana State Revolving Fund Programs",
+      "authority": "Indiana Finance Authority",
+      "cadence": "periodic",
+      "geographic_scope": "Indiana water infrastructure",
+      "endpoint": "https://www.in.gov/ifa/srf/",
+      "ttl_seconds": 86400,
+      "enabled": true
+    },
+    {
+      "source_id": "usda-rd-community-facilities",
+      "name": "USDA Rural Development Community Facilities",
+      "authority": "USDA Rural Development",
+      "cadence": "rolling",
+      "geographic_scope": "Eligible rural communities",
+      "endpoint": "https://www.rd.usda.gov/programs-services/community-facilities",
+      "ttl_seconds": 86400,
+      "enabled": true
+    },
+    {
+      "source_id": "fema-bric",
+      "name": "FEMA Building Resilient Infrastructure and Communities",
+      "authority": "FEMA",
+      "cadence": "periodic",
+      "geographic_scope": "United States eligible applicants",
+      "endpoint": "https://www.fema.gov/grants/mitigation/building-resilient-infrastructure-communities",
+      "ttl_seconds": 86400,
+      "enabled": true
+    },
+    {
+      "source_id": "indiana-broadband-office",
+      "name": "Indiana Broadband Office",
+      "authority": "State of Indiana",
+      "cadence": "periodic",
+      "geographic_scope": "Indiana broadband deployment",
+      "endpoint": "https://www.in.gov/indiana-broadband-office/",
+      "ttl_seconds": 86400,
+      "enabled": true
+    }
+  ]
+}
