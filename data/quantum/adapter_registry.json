@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "adapters": [
+    {"backend_id":"qiskit","name":"Qiskit","modules":["qiskit"],"capabilities":["circuits","transpilation","primitives"],"upstream":"https://github.com/Qiskit/qiskit"},
+    {"backend_id":"cirq","name":"Cirq","modules":["cirq"],"capabilities":["circuits","simulation","nisq"],"upstream":"https://github.com/quantumlib/Cirq"},
+    {"backend_id":"pennylane","name":"PennyLane","modules":["pennylane"],"capabilities":["qml","autodiff","hybrid"],"upstream":"https://github.com/PennyLaneAI/pennylane"},
+    {"backend_id":"qdk","name":"Microsoft QDK","modules":["qsharp"],"capabilities":["qsharp","resource-estimation","openqasm"],"upstream":"https://github.com/microsoft/qdk"},
+    {"backend_id":"tket","name":"Quantinuum TKET","modules":["pytket"],"capabilities":["compilation","optimization","hardware-agnostic"],"upstream":"https://github.com/Quantinuum/tket2"},
+    {"backend_id":"ocean","name":"D-Wave Ocean","modules":["dwave"],"capabilities":["annealing","optimization","qubo"],"upstream":"https://github.com/dwavesystems/dwave-ocean-sdk"},
+    {"backend_id":"pyquil","name":"Rigetti PyQuil","modules":["pyquil"],"capabilities":["quil","simulation","qpu"],"upstream":"https://github.com/rigetti/pyquil"},
+    {"backend_id":"pulser","name":"Pasqal Pulser","modules":["pulser"],"capabilities":["neutral-atom","pulse-control"],"upstream":"https://github.com/pasqal-io/Pulser"},
+    {"backend_id":"bartiq","name":"PsiQuantum Bartiq","modules":["bartiq"],"capabilities":["resource-estimation","fault-tolerant"],"upstream":"https://github.com/PsiQ/bartiq"},
+    {"backend_id":"open-controls","name":"Q-CTRL Open Controls","modules":["qctrlopencontrols"],"capabilities":["quantum-control","error-robustness"],"upstream":"https://github.com/qctrl/open-controls"}
+  ]
+}

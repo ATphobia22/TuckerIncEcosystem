@@ -5,17 +5,20 @@ from datetime import datetime, timezone
 from fastapi import FastAPI
 
 from .backends import discover_backends
+from .benchmarks import BenchmarkResult, aggregate
+from .capabilities import discover_capabilities
 from .event_bus import DataEvent, EventBus
-from .evidence import EvidenceEnvelope, append_evidence, content_hash
+from .evidence import EvidenceEnvelope, EVIDENCE_ROOT, append_evidence, content_hash
 from .fabric import DataRecord
 from .guardrails import GuardrailRequest, evaluate_guardrails
+from .self_healing import propose_remediation
 from .source_mesh import enabled_sources
 from .tucker_ai import TuckerExperiment
 
 app = FastAPI(
     title="Tucker AI",
     description="Standalone hybrid quantum-classical AI and authoritative data-fabric gateway.",
-    version="0.4.0",
+    version="0.5.0",
 )
 
 EVENT_BUS = EventBus()
@@ -38,6 +41,11 @@ def quantum_capabilities() -> dict[str, object]:
     return {"count": len(backends), "backends": backends}
 
 
+@app.get("/api/tucker-ai/capability-discovery")
+def capability_discovery() -> dict[str, object]:
+    return discover_capabilities()
+
+
 @app.post("/api/tucker-ai/guardrails/evaluate")
 def evaluate_tucker_guardrails(request: GuardrailRequest) -> dict[str, object]:
     return evaluate_guardrails(request).model_dump(mode="json")
@@ -56,7 +64,7 @@ def validate_record(record: DataRecord) -> dict[str, object]:
 @app.post("/api/evidence/append")
 def append_evidence_record(envelope: EvidenceEnvelope) -> dict[str, object]:
     path = append_evidence(envelope)
-    return {"path": str(path.relative_to(path.parents[3])), "content_hash": content_hash(envelope.payload)}
+    return {"path": str(path.relative_to(EVIDENCE_ROOT)), "content_hash": content_hash(envelope.payload)}
 
 
 @app.post("/api/events/publish")
@@ -72,6 +80,16 @@ def replay_dead_letters(limit: int = 100) -> dict[str, object]:
 @app.get("/api/events/status")
 def event_status() -> dict[str, object]:
     return EVENT_BUS.snapshot()
+
+
+@app.post("/api/remediation/propose")
+def remediation_proposal(target: str, message: str, retryable: bool = False) -> dict[str, object]:
+    return propose_remediation(target, RuntimeError(message), retryable=retryable).model_dump(mode="json")
+
+
+@app.post("/api/benchmarks/aggregate")
+def benchmark_aggregate(results: list[BenchmarkResult]) -> dict[str, float]:
+    return aggregate(results)
 
 
 @app.get("/api/data-fabric/clock")
