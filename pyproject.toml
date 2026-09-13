@@ -4,8 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "tuckerinc82"
-version = "0.3.1"
-description = "Tucker AI: hybrid quantum-classical AI, governed experimentation, and authoritative data fabric"
+version = "0.6.0"
+description = "Tucker AI: hybrid quantum-classical AI, governed experimentation, authoritative data fabric, and interoperability"
 requires-python = ">=3.11"
 dependencies = [
     "fastapi>=0.135.3",
@@ -26,21 +26,29 @@ qml = [
     "amazon-braket-sdk>=1.99,<2",
     "merlinquantum>=0.4,<0.5"
 ]
+quantum-ecosystem = [
+    "qiskit>=2.2,<3",
+    "cirq>=1.6,<2",
+    "pytket>=2,<3",
+    "dwave-ocean-sdk>=9.3,<10",
+    "pyquil>=4.18,<5",
+    "pulser>=1.9,<2",
+    "bartiq>=0.17,<1",
+    "qctrl-open-controls",
+    "qsharp"
+]
+context = ["turbovec>=0.1"]
 tensorflow-quantum = [
     "tensorflow>=2.19,<2.20",
     "tensorflow-quantum>=0.7,<1"
 ]
-photonic = [
-    "merlinquantum>=0.4,<0.5"
-]
+photonic = ["merlinquantum>=0.4,<0.5"]
 physics = [
     "qutip>=5.3,<6",
     "dynamiqs>=0.4,<1",
     "openfermion>=1.8,<2"
 ]
-optimization = [
-    "dwave-ocean-sdk>=9.3,<10"
-]
+optimization = ["dwave-ocean-sdk>=9.3,<10"]
 dev = [
     "httpx>=0.28",
     "pytest>=8.4",
