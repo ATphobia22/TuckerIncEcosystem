@@ -6,15 +6,18 @@ from typing import Any
 
 from fastapi import FastAPI
 
+from .backends import discover_backends
 from .fabric import DataRecord
+from .guardrails import GuardrailRequest, evaluate_guardrails
+from .tucker_ai import TuckerExperiment
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRY_PATH = ROOT / "data" / "sources" / "source_registry.json"
 
 app = FastAPI(
-    title="TuckerInc.82 Data Fabric",
-    description="Standalone cross-project integration and authoritative data-fabric gateway.",
-    version="0.2.0",
+    title="Tucker AI",
+    description="Standalone hybrid quantum-classical AI and authoritative data-fabric gateway.",
+    version="0.3.0",
 )
 
 
@@ -31,13 +34,29 @@ def load_source_registry() -> list[dict[str, Any]]:
 
 @app.get("/api/health")
 def health() -> dict[str, str]:
-    return {"status": "ok", "service": "tuckerinc82-data-fabric"}
+    return {"status": "ok", "service": "tucker-ai"}
 
 
 @app.get("/api/sources")
 def sources() -> dict[str, Any]:
     registered = load_source_registry()
     return {"count": len(registered), "sources": registered}
+
+
+@app.get("/api/tucker-ai/capabilities")
+def quantum_capabilities() -> dict[str, Any]:
+    backends = discover_backends()
+    return {"count": len(backends), "backends": backends}
+
+
+@app.post("/api/tucker-ai/guardrails/evaluate")
+def evaluate_tucker_guardrails(request: GuardrailRequest) -> dict[str, Any]:
+    return evaluate_guardrails(request).model_dump(mode="json")
+
+
+@app.post("/api/tucker-ai/experiments/validate")
+def validate_tucker_experiment(experiment: TuckerExperiment) -> dict[str, Any]:
+    return experiment.model_dump(mode="json")
 
 
 @app.post("/api/records/validate")
