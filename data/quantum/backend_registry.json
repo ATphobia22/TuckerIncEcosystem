@@ -1,0 +1,59 @@
+{
+  "schema_version": "1.0",
+  "backends": [
+    {
+      "backend_id": "pennylane",
+      "name": "PennyLane",
+      "modules": ["pennylane"],
+      "capabilities": ["qml", "autodiff", "hybrid"]
+    },
+    {
+      "backend_id": "qiskit-machine-learning",
+      "name": "Qiskit Machine Learning",
+      "modules": ["qiskit_machine_learning"],
+      "capabilities": ["qml", "quantum-kernels", "torch-hybrid"]
+    },
+    {
+      "backend_id": "torchquantum",
+      "name": "TorchQuantum",
+      "modules": ["torchquantum"],
+      "capabilities": ["pytorch", "dynamic-circuits", "qml"]
+    },
+    {
+      "backend_id": "cuda-q",
+      "name": "CUDA-Q",
+      "modules": ["cudaq"],
+      "capabilities": ["gpu", "cpu", "qpu", "hybrid"]
+    },
+    {
+      "backend_id": "cirq",
+      "name": "Cirq",
+      "modules": ["cirq"],
+      "capabilities": ["circuits", "simulation", "nisq"]
+    },
+    {
+      "backend_id": "tensorflow-quantum",
+      "name": "TensorFlow Quantum",
+      "modules": ["tensorflow_quantum"],
+      "capabilities": ["tensorflow", "keras", "qml"]
+    },
+    {
+      "backend_id": "mitiq",
+      "name": "Mitiq",
+      "modules": ["mitiq"],
+      "capabilities": ["error-mitigation", "benchmarking"]
+    },
+    {
+      "backend_id": "amazon-braket",
+      "name": "Amazon Braket SDK",
+      "modules": ["braket"],
+      "capabilities": ["managed-qpu", "hybrid-jobs"]
+    },
+    {
+      "backend_id": "merlin",
+      "name": "MerLin",
+      "modules": ["merlin"],
+      "capabilities": ["photonic-qml", "hybrid"]
+    }
+  ]
+}
