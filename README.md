@@ -20,17 +20,31 @@ Research Benchmarks / Applications / Analytics
 
 ## Tucker AI
 
-The repository now provides a provider-neutral quantum-AI layer with:
+The repository provides a provider-neutral quantum-AI layer with:
 
 - deterministic small-circuit statevector reference execution;
 - typed hybrid experiment contracts;
 - reproducibility hashes and provenance identifiers;
 - machine-checkable **God is Love Protocol** guardrails with `allow`, `review`, and `deny` outcomes;
 - optional capability discovery for PennyLane, Qiskit Machine Learning, TorchQuantum, CUDA-Q, Cirq, TensorFlow Quantum, Mitiq, Amazon Braket, and MerLin;
+- a research registry covering major open quantum/QML stacks and interoperability standards;
 - an explicit benchmark protocol requiring classical baselines, uncertainty, resource accounting, and simulator/QPU separation;
 - no unsupported quantum-advantage claims.
 
 The backend ecosystem is adapter-based rather than wholesale vendored. This keeps upstream licenses, release cadence, and dependency boundaries intact.
+
+## Deep quantum-AI research
+
+The current framework survey, architecture recommendations, standards mapping, and innovation roadmap are documented in:
+
+- `docs/quantum/tucker-ai-research.md`
+- `data/quantum/framework_registry.json`
+- `docs/research/backend-integration-matrix.md`
+- `docs/research/tucker-ai-benchmark-protocol.md`
+- `docs/superpowers/specs/2026-09-13-tucker-ai-qml-design.md`
+- `docs/superpowers/plans/2026-09-13-tucker-ai-qml.md`
+
+The interoperability strategy uses **OpenQASM 3** and **QIR** as standards-oriented boundaries where practical. Responsible-AI governance is aligned conceptually with NIST AI RMF, ISO/IEC 42001, and UNESCO's AI ethics recommendation; Tucker AI does not claim certification under any of them.
 
 ## Current implementation
 
@@ -48,16 +62,20 @@ The backend ecosystem is adapter-based rather than wholesale vendored. This keep
 - Preserved Tucker Console compatibility utility under `legacy/`.
 - GitHub Actions CI for Ruff and Pytest.
 
-## Research integrations
+## Dependency strategy
 
-See:
+The base runtime stays lightweight. Heavy quantum stacks are optional extras so a clean deployment does not inherit every vendor/runtime dependency.
 
-- `docs/research/backend-integration-matrix.md`
-- `docs/research/tucker-ai-benchmark-protocol.md`
-- `docs/superpowers/specs/2026-09-13-tucker-ai-qml-design.md`
-- `docs/superpowers/plans/2026-09-13-tucker-ai-qml.md`
+```bash
+python -m pip install -e '.[dev]'
+python -m pip install -e '.[qml]'
+python -m pip install -e '.[photonic]'
+python -m pip install -e '.[physics]'
+python -m pip install -e '.[optimization]'
+python -m pip install -e '.[tensorflow-quantum]'
+```
 
-Install the lightweight base runtime for the reference backend. Install `.[qml]` only when provider SDKs are required. TensorFlow Quantum is isolated in `.[tensorflow-quantum]` because its supported Python/TensorFlow matrix differs from the general stack.
+Provider availability and platform compatibility must be verified before a production deployment. Optional extras are not a promise that every framework can coexist in one Python environment.
 
 ## Source integration policy
 
@@ -81,12 +99,6 @@ ruff check .
 pytest -q
 ```
 
-For quantum provider experiments:
-
-```bash
-python -m pip install -e '.[qml]'
-```
-
 Application entrypoint: `main:app`.
 
 ## Security baseline
@@ -95,4 +107,4 @@ Do not commit API keys, tokens, private keys, certificates, credentials, model w
 
 ## Ethical governance
 
-The God is Love Protocol is a user-authored governance layer emphasizing human dignity, non-maleficence, truthfulness, consent, privacy, fairness, transparency, accountability, and human oversight. It is not presented as legal, regulatory, or scientific certification.
+The God is Love Protocol is a user-authored governance layer emphasizing human dignity, non-maleficence, truthfulness, consent, privacy, fairness, transparency, accountability, and human oversight. It is not presented as legal, regulatory, scientific, or religious certification and does not override applicable law, safety controls, or legitimate human governance.
